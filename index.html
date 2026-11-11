@@ -1,717 +1,306 @@
 <!DOCTYPE html>
-<html class="no-js" lang="en">
+<html lang="en">
 <head>
+  <meta charset="utf-8">
+  <title>Bohdan Tkachuk — iOS Developer</title>
+  <meta name="description" content="Bohdan Tkachuk — iOS developer. Apps, LinkedIn and GitHub.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07060d">
+  <style>
+    :root {
+      --bg:#07060d; --fg:#f4f3fa; --muted:#9b98b0;
+      --glass:rgba(255,255,255,.05); --line:rgba(255,255,255,.12);
+      --a:#7c5cff; --b:#00d4ff; --c:#ff4fd8;
+    }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      margin:0; min-height:100vh; background:var(--bg); color:var(--fg); overflow-x:hidden;
+      font:17px/1.55 -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+    }
 
-    <!--- basic page needs
-    ================================================== -->
-    <meta charset="utf-8">
-    <title>Epitome</title>
-    <meta name="description" content="">
-    <meta name="author" content="">
+    /* animated background */
+    .bg { position:fixed; inset:0; z-index:-2; overflow:hidden; }
+    .blob { position:absolute; width:55vmax; height:55vmax; border-radius:50%; filter:blur(90px); opacity:.5; will-change:transform; }
+    .blob.one { background:var(--a); top:-20vmax; left:-15vmax; animation:float1 18s ease-in-out infinite alternate; }
+    .blob.two { background:var(--b); bottom:-25vmax; right:-15vmax; opacity:.38; animation:float2 22s ease-in-out infinite alternate; }
+    .blob.three { background:var(--c); top:30%; left:45%; width:35vmax; height:35vmax; opacity:.25; animation:float3 26s ease-in-out infinite alternate; }
+    @keyframes float1 { to { transform:translate(25vmax,18vmax) scale(1.2); } }
+    @keyframes float2 { to { transform:translate(-22vmax,-15vmax) scale(.85); } }
+    @keyframes float3 { to { transform:translate(-18vmax,12vmax) scale(1.3); } }
+    .grid {
+      position:fixed; inset:0; z-index:-1; pointer-events:none;
+      background-image:linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size:56px 56px; opacity:.25;
+      -webkit-mask-image:radial-gradient(ellipse at center, #000 20%, transparent 75%);
+              mask-image:radial-gradient(ellipse at center, #000 20%, transparent 75%);
+    }
+    #fx { position:fixed; inset:0; width:100%; height:100%; z-index:-1; pointer-events:none; }
+    .cursor-glow {
+      position:fixed; width:420px; height:420px; border-radius:50%; pointer-events:none; z-index:-1;
+      background:radial-gradient(circle, rgba(124,92,255,.22), transparent 65%);
+      transform:translate(-50%,-50%); left:50%; top:30%; transition:opacity .3s;
+    }
 
-    <!-- mobile specific metas
-    ================================================== -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    main { max-width:680px; margin:0 auto; padding:clamp(56px,12vh,120px) 22px 56px; }
 
-    <!-- CSS
-    ================================================== -->
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/vendor.css">
-    <link rel="stylesheet" href="css/main.css">
+    /* hero */
+    .badge {
+      display:inline-flex; align-items:center; gap:8px; padding:6px 14px; border-radius:99px;
+      background:var(--glass); border:1px solid var(--line); backdrop-filter:blur(10px);
+      font-size:.85rem; color:var(--muted); margin-bottom:22px;
+    }
+    .dot { width:8px; height:8px; border-radius:50%; background:#3dff9a; box-shadow:0 0 0 0 rgba(61,255,154,.7); animation:pulse 2s infinite; }
+    @keyframes pulse { 70% { box-shadow:0 0 0 10px rgba(61,255,154,0); } 100% { box-shadow:0 0 0 0 rgba(61,255,154,0); } }
 
-    <!-- script
-    ================================================== -->
-    <script src="js/modernizr.js"></script>
-    <script src="js/pace.min.js"></script>
+    h1 {
+      font-size:clamp(2.6rem,9vw,4.4rem); line-height:1.02; letter-spacing:-.035em; margin:0 0 14px; font-weight:800;
+      background:linear-gradient(110deg, #fff 20%, var(--b) 40%, var(--a) 60%, var(--c) 80%, #fff);
+      background-size:250% 100%; -webkit-background-clip:text; background-clip:text; color:transparent;
+      animation:shine 6s linear infinite;
+    }
+    @keyframes shine { to { background-position:-250% 0; } }
+    .role { font-size:clamp(1.15rem,3.5vw,1.5rem); color:var(--muted); margin:0 0 6px; min-height:1.6em; }
+    .caret { display:inline-block; width:2px; height:1.1em; background:var(--b); margin-left:3px; vertical-align:-3px; animation:blink 1s steps(1) infinite; }
+    @keyframes blink { 50% { opacity:0; } }
 
-    <!-- favicons
-    ================================================== -->
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-    <link rel="manifest" href="site.webmanifest">
+    h2 {
+      font-size:.78rem; text-transform:uppercase; letter-spacing:.18em; color:var(--muted);
+      margin:52px 0 14px; display:flex; align-items:center; gap:12px;
+    }
+    h2::after { content:""; flex:1; height:1px; background:linear-gradient(90deg, var(--line), transparent); }
 
+    /* cards */
+    .list { display:grid; gap:12px; perspective:900px; }
+    a.item {
+      position:relative; display:flex; align-items:center; gap:16px; padding:16px 18px; border-radius:18px;
+      background:var(--glass); border:1px solid var(--line); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+      color:var(--fg); text-decoration:none; overflow:hidden;
+      transition:transform .25s ease, border-color .25s, box-shadow .25s;
+      transform-style:preserve-3d; will-change:transform;
+    }
+    a.item::before { /* spotlight following mouse */
+      content:""; position:absolute; inset:0; opacity:0; transition:opacity .3s; pointer-events:none;
+      background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%), rgba(124,92,255,.28), transparent 70%);
+    }
+    a.item:hover { border-color:rgba(124,92,255,.7); box-shadow:0 12px 40px -12px rgba(124,92,255,.55); }
+    a.item:hover::before { opacity:1; }
+    a.item:focus-visible { outline:2px solid var(--b); outline-offset:3px; }
+    .ico {
+      --g1:var(--a); --g2:var(--b);
+      position:relative; flex:none; width:50px; height:50px; border-radius:15px; display:grid; place-items:center;
+      background:linear-gradient(135deg, var(--g1), var(--g2));
+      box-shadow:0 8px 22px -6px var(--g1), inset 0 1px 0 rgba(255,255,255,.35);
+      transition:transform .45s cubic-bezier(.34,1.56,.64,1), box-shadow .3s;
+    }
+    .ico::before { /* spinning glow ring */
+      content:""; position:absolute; inset:-3px; border-radius:18px; z-index:-1; opacity:0; transition:opacity .3s;
+      background:conic-gradient(from 0deg, var(--g1), var(--g2), var(--c), var(--g1));
+      filter:blur(6px); animation:spin 3s linear infinite paused;
+    }
+    .ico::after { /* shine sweep */
+      content:""; position:absolute; inset:0; border-radius:inherit; overflow:hidden;
+      background:linear-gradient(115deg, transparent 35%, rgba(255,255,255,.55) 50%, transparent 65%);
+      background-size:250% 100%; background-position:150% 0; transition:background-position .7s;
+    }
+    a.item:hover .ico { transform:scale(1.14) rotate(-8deg); box-shadow:0 12px 30px -4px var(--g1), inset 0 1px 0 rgba(255,255,255,.4); }
+    a.item:hover .ico::before { opacity:.9; animation-play-state:running; }
+    a.item:hover .ico::after { background-position:-50% 0; }
+    .ico svg { position:relative; z-index:1; width:26px; height:26px; fill:#fff; filter:drop-shadow(0 2px 4px rgba(0,0,0,.35)); animation:bob 3.6s ease-in-out infinite; }
+    a.item:hover .ico svg { animation:wiggle .6s ease; }
+    .ico.apple    { --g1:#8e8e93; --g2:#2c2c2e; }
+    .ico.store    { --g1:#2dd4ff; --g2:#1a6bff; }
+    .ico.github   { --g1:#a66bff; --g2:#3b2a8f; }
+    .ico.linkedin { --g1:#2f9bff; --g2:#0a4fb3; }
+    .ico.mail     { --g1:#ff7ab8; --g2:#ff5a36; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    @keyframes bob { 50% { transform:translateY(-2px); } }
+    @keyframes wiggle { 25% { transform:rotate(-14deg) scale(1.1); } 55% { transform:rotate(10deg) scale(1.1); } 100% { transform:rotate(0); } }
+    .txt { flex:1; min-width:0; }
+    .txt b { display:block; font-weight:650; }
+    .txt small { color:var(--muted); font-size:.86rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:block; }
+    .arrow { color:var(--muted); transition:transform .25s, color .25s; font-size:1.2rem; }
+    a.item:hover .arrow { transform:translate(4px,-4px); color:var(--fg); }
+
+    footer { margin-top:64px; color:var(--muted); font-size:.85rem; text-align:center; }
+
+    /* entrance animation */
+    .reveal { opacity:0; transform:translateY(24px); animation:in .8s cubic-bezier(.2,.8,.2,1) forwards; animation-delay:calc(var(--i,0) * 110ms + 100ms); }
+    @keyframes in { to { opacity:1; transform:none; } }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration:.001s !important; animation-iteration-count:1 !important; transition:none !important; }
+    }
+  </style>
 </head>
+<body>
+  <div class="bg"><div class="blob one"></div><div class="blob two"></div><div class="blob three"></div></div>
+  <canvas id="fx"></canvas>
+  <div class="grid"></div>
+  <div class="cursor-glow" id="glow"></div>
 
-<body id="top">
+  <main>
+    <div class="badge reveal" style="--i:0"><span class="dot"></span> Available for new projects</div>
+    <h1 class="reveal" style="--i:1">Bohdan<br>Tkachuk</h1>
+    <p class="role reveal" style="--i:2"><span id="type"></span><span class="caret"></span></p>
 
-    <div id="preloader">
-        <div id="loader"></div>
+    <h2 class="reveal" style="--i:3">Apps</h2>
+    <div class="list">
+      <a class="item reveal" style="--i:4" href="https://apps.apple.com/us/app/freelance-invoice-creator/id6751070527" target="_blank" rel="noopener">
+        <span class="ico store"><svg viewBox="0 0 24 24"><path d="M16.37 12.6c-.03-2.6 2.13-3.85 2.23-3.91-1.21-1.77-3.1-2.01-3.77-2.04-1.6-.16-3.13.95-3.94.95-.82 0-2.07-.93-3.4-.9-1.75.03-3.36 1.02-4.26 2.58-1.82 3.15-.47 7.82 1.3 10.38.87 1.25 1.9 2.66 3.26 2.61 1.31-.05 1.8-.85 3.38-.85 1.58 0 2.03.85 3.4.82 1.41-.02 2.3-1.28 3.16-2.54 1-1.46 1.41-2.87 1.43-2.94-.03-.01-2.75-1.05-2.78-4.16zM13.76 4.96c.72-.87 1.2-2.08 1.07-3.29-1.04.04-2.29.69-3.04 1.56-.67.77-1.25 2-1.1 3.19 1.16.09 2.35-.59 3.07-1.46z"/></svg></span>
+        <span class="txt"><b>Freelance Invoice Creator</b><small>App Store · iOS</small></span>
+        <span class="arrow">↗</span>
+      </a>
     </div>
 
-    <!-- site header
-    ================================================== -->
-    <header class="s-header">
-
-        <div class="header-logo">
-            <a class="site-logo" href="index.html">
-                <img src="images/logo.svg" alt="Homepage">
-            </a>
-        </div>
-
-        <nav class="header-nav-wrap">
-            <ul class="header-main-nav">
-                <li class="current"><a class="smoothscroll" href="#intro" title="intro">Intro</a></li>
-                <li><a class="smoothscroll" href="#about" title="about">About</a></li>
-                <li><a class="smoothscroll" href="#services" title="services">Services</a></li>
-                <li><a class="smoothscroll" href="#works" title="works">Works</a></li>
-                <li><a class="smoothscroll" href="#contact" title="contact us">Say Hello</a></li>	
-            </ul>
-
-            <ul class="header-social">
-                <li><a href="#0"><i class="fab fa-facebook-f" aria-hidden="true"></i></a></li>
-                <li><a href="#0"><i class="fab fa-twitter" aria-hidden="true"></i></a></li>
-                <li><a href="#0"><i class="fab fa-dribbble" aria-hidden="true"></i></a></li>
-                <li><a href="#0"><i class="fab fa-behance" aria-hidden="true"></i></a></li>
-            </ul>
-        </nav>
-
-        <a class="header-menu-toggle" href="#"><span>Menu</span></a>
-
-    </header> <!-- end s-header -->
-
-
-    <!-- intro
-    ================================================== -->
-    <section id="intro" class="s-intro target-section">
-
-        <div class="row intro-content">
-
-            <div class="column large-9 mob-full intro-text">
-                <h3>Hello, I'm John Doe</h3>
-                <h1>
-                    Digital Designer <br>
-                    and Web Developer <br>
-                    Based In Somewhere.
-                </h1>
-            </div>
-
-            <div class="intro-scroll">
-                <a href="#about" class="intro-scroll-link smoothscroll">
-                    Scroll For More
-                </a>
-            </div>
-
-            <div class="intro-grid"></div>
-            <div class="intro-pic"></div>
-
-        </div> <!-- end row -->
-
-    </section> <!-- end intro -->
-
-
-    <!-- about
-    ================================================== -->
-    <section id="about" class="s-about target-section">
-
-        <div class="about-me">
-
-            <div class="row heading-block" data-aos="fade-up">
-                <div class="column large-full">
-                    <h2 class="section-heading">About Me</h2>
-                </div>
-            </div>
-
-            <div class="row about-me__content" data-aos="fade-up">
-                <div class="column large-full about-me__text">
-                    <p class="lead">
-                    Nulla aspernatur nam et accusantium. Tempore delectus dignissimos aut
-                    ab commodi. Labore et cupiditate temporibus odio debitis eaque. 
-                    Officia provident aut iste et dicta perferendis. Velit iure adipisci. 
-                    Molestiae qui fuga rerum facilis.
-                    </p>
-
-                    <p>
-                    Reprehenderit quia id facilis nihil odit perferendis fugiat quidem voluptas. 
-                    Non ratione tenetur. Quis earum quia deleniti fugit fugiat minus omnis. 
-                    Iure dolore dolorum. Aspernatur quos cumque ea dolorum nemo nihil 
-                    beatae magnam. Qui molestiae rem. Maxime enim provident ipsum reprehenderit tenetur. Et cupiditate 
-                    repellendus. Et modi ipsum aut harum. Ratione alias.
-                    </p>
-
-                    <p>
-                    Rerum consequatur dolore quae.
-                    Qui excepturi facilis quam quae quasi. Mollitia occaecati minus voluptas veniam.
-                    Qui excepturi facilis quam quae quasi. Mollitia occaecati minus voluptas veniam. Est est occaecati dolor 
-                    qui aut et eum. Aspernatur quos cumque ea dolorum nemo nihil 
-                    beatae magnam. Qui molestiae rem.
-                    </p>
-
-                    <p>
-                    Maxime enim provident ipsum reprehenderit tenetur. Et cupiditate 
-                    repellendus. Et modi ipsum aut harum. Ratione alias sed. Rerum 
-                    consequatur dolore quae. Qui excepturi facilis quam quae quasi. 
-                    Mollitia occaecati minus voluptas veniam. Est est occaecati dolor 
-                    qui aut et eum. Aspernatur quos cumque ea dolorum nemo nihil 
-                    beatae magnam. Qui molestiae rem. Aspernatur quos cumque ea dolorum 
-                    nemo nihil. Qui molestiae rem.
-                    </p>
-                </div>
-            </div>
-    
-            <div class="row about-me__buttons">
-                <div class="column large-half tab-full" data-aos="fade-up">
-                    <a href="#0" class="btn btn--stroke full-width">Hire Me</a>
-                </div>
-                <div class="column large-half tab-full" data-aos="fade-up">
-                    <a href="#0" class="btn btn--primary full-width">Download CV</a>
-                </div>
-            </div>
-
-        </div> <!-- end about-me -->
-
-        <div class="about-experience">
-
-            <div class="row heading-block" data-aos="fade-up">
-                <div class="column large-full">
-                    <h2 class="section-heading">Work & Education</h2>
-                </div>
-            </div>
-
-            <div class="row about-experience__timeline">
-
-                <div class="column large-half tab-full" data-aos="fade-up">
-                    <div class="timeline">
-
-                        <div class="timeline__icon-wrap">
-                            <span class="timeline__icon timeline__icon--work"></span>
-                        </div>
-
-                        <div class="timeline__block">
-                            <div class="timeline__bullet"></div>
-                            <div class="timeline__header">
-                                <p class="timeline__timeframe">July 2018 - Present</p>
-                                <h3 class="item-title">Awesome Studio</h3>
-                                <h5>Lead Designer</h5>
-                            </div>
-                            <div class="timeline__desc">
-                                <p>Lorem ipsum Occaecat do esse ex et dolor culpa nisi ex in magna consectetur nisi cupidatat laboris esse eiusmod deserunt aute do quis velit esse sed Ut proident cupidatat nulla esse cillum laborum occaecat nostrud sit dolor incididunt amet est occaecat nisi.</p>
-                            </div>
-                        </div>
-
-                        <div class="timeline__block">
-                            <div class="timeline__bullet"></div>
-                            <div class="timeline__header">
-                                <p class="timeline__timeframe">July 2017 - June 2018</p>
-                                <h3 class="item-title">Super Cool Agency</h3>
-                                <h5>Frontend Developer</h5>
-                            </div>
-                            <div class="timeline__desc">
-                                <p>Lorem ipsum Occaecat do esse ex et dolor culpa nisi ex in magna consectetur nisi cupidatat laboris esse eiusmod deserunt aute do quis velit esse sed Ut proident cupidatat nulla esse cillum laborum occaecat nostrud sit dolor incididunt amet est occaecat nisi.</p>
-                            </div>
-                        </div>
-
-                        <div class="timeline__block">
-                            <div class="timeline__bullet"></div>
-                            <div class="timeline__header">
-                                <p class="timeline__timeframe">March 2016 - June 2017</p>
-                                <h3 class="item-title">Epic Design Studio</h3>
-                                <h5>Frontend Developer</h5>
-                            </div>
-                            <div class="timeline__desc">
-                                <p>Lorem ipsum Occaecat do esse ex et dolor culpa nisi ex in magna consectetur nisi cupidatat laboris esse eiusmod deserunt aute do quis velit esse sed Ut proident cupidatat nulla esse cillum laborum occaecat nostrud sit dolor incididunt amet est occaecat nisi.</p>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-                <div class="column large-half tab-full" data-aos="fade-up">
-                    <div class="timeline">
-
-                        <div class="timeline__icon-wrap">
-                            <span class="timeline__icon timeline__icon--education"></span>
-                        </div>
-
-                        <div class="timeline__block">
-                            <div class="timeline__bullet"></div>
-                            <div class="timeline__header">
-                                <p class="timeline__timeframe">July 2011 - June 2015</p>
-                                <h3 class="item-title">University of Life</h3>
-                                <h5>Master Degree</h5>
-                            </div>
-                            <div class="timeline__desc">
-                                <p>Lorem ipsum Occaecat do esse ex et dolor culpa nisi ex in magna consectetur nisi cupidatat laboris esse eiusmod deserunt aute do quis velit esse sed Ut proident cupidatat nulla esse cillum laborum occaecat nostrud sit dolor incididunt amet est occaecat nisi.</p>
-                            </div>
-                        </div>
-
-                        <div class="timeline__block">
-                            <div class="timeline__bullet"></div>
-                            <div class="timeline__header">
-                                <p class="timeline__timeframe">July 2009 - June 2011</p>
-                                <h3 class="item-title">State Design University</h3>
-                                <h5>Bachelor Degree</h5>
-                            </div>
-                            <div class="timeline__desc">
-                                <p>Lorem ipsum Occaecat do esse ex et dolor culpa nisi ex in magna consectetur nisi cupidatat laboris esse eiusmod deserunt aute do quis velit esse sed Ut proident cupidatat nulla esse cillum laborum occaecat nostrud sit dolor incididunt amet est occaecat nisi.</p>
-                            </div>
-                        </div>
-
-                        <div class="timeline__block">
-                            <div class="timeline__bullet"></div>
-                            <div class="timeline__header">
-                                <p class="timeline__timeframe">July 2005 - June 2009</p>
-                                <h3 class="item-title">School of Hard Knocks</h3>
-                                <h5>Bachelor Degree</h5>
-                            </div>
-                            <div class="timeline__desc">
-                                <p>Lorem ipsum Occaecat do esse ex et dolor culpa nisi ex in magna consectetur nisi cupidatat laboris esse eiusmod deserunt aute do quis velit esse sed Ut proident cupidatat nulla esse cillum laborum occaecat nostrud sit dolor incididunt amet est occaecat nisi.</p>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
-        </div> <!-- end about-experience -->
-
-    </section> <!-- end s-about -->
-
-
-    <!-- services
-    ================================================== -->
-    <section id="services" class="s-services ss-dark target-section">
-
-        <div class="shadow-overlay"></div>
-
-        <div class="row heading-block heading-block--center" data-aos="fade-up">
-            <div class="column large-full">
-                <h2 class="section-heading section-heading--centerbottom">Capabilities</h2>
-
-                <p class="section-desc">
-                    My passion and goal is to help you make your business standout.
-                </p>
-            </div>
-        </div> <!-- end heading-block -->
-
-        <div class="row services-list block-large-1-3 block-medium-1-2 block-tab-full">
-
-            <div class="column item-service" data-aos="fade-up">
-                <div class="item-service__content">
-                    <h4 class="item-title">Brand Identity</h4>
-                    <p>
-                    Sit ut cum molestiae. Dolore ducimus qui quasi. Fugiat consequatur sit vel illum vel et 
-                    a delectus. Vel sequi vitae voluptatem perspiciatis eligendi. Voluptatibus optio natus 
-                    asperiores est commodi amet quia architecto. Dolores necessitatibus et.
-                    </p>
-                </div>
-            </div>
-
-            <div class="column item-service" data-aos="fade-up">
-                <div class="item-service__content">
-                    <h4 class="item-title">Illustration</h4>
-                    <p>
-                    Sit ut cum molestiae. Dolore ducimus qui quasi. Fugiat consequatur sit vel illum vel et 
-                    a delectus. Vel sequi vitae voluptatem perspiciatis eligendi. Voluptatibus optio natus 
-                    asperiores est commodi amet quia architecto. Dolores necessitatibus et.
-                    </p>
-                </div>
-            </div>
-
-            <div class="column item-service" data-aos="fade-up">
-                <div class="item-service__content">
-                    <h4 class="item-title">Web Design</h4>
-                    <p>
-                    Sit ut cum molestiae. Dolore ducimus qui quasi. Fugiat consequatur sit vel illum vel et 
-                    a delectus. Vel sequi vitae voluptatem perspiciatis eligendi. Voluptatibus optio natus 
-                    asperiores est commodi amet quia architecto. Dolores necessitatibus et.
-                    </p>
-                </div>
-            </div>
-
-            <div class="column item-service" data-aos="fade-up">
-                <div class="item-service__content">
-                    <h4 class="item-title">Product Strategy</h4>
-                    <p>
-                    Sit ut cum molestiae. Dolore ducimus qui quasi. Fugiat consequatur sit vel illum vel et 
-                    a delectus. Vel sequi vitae voluptatem perspiciatis eligendi. Voluptatibus optio natus 
-                    asperiores est commodi amet quia architecto. Dolores necessitatibus et.
-                    </p>
-                </div>
-            </div>
-
-            <div class="column item-service" data-aos="fade-up">
-                <div class="item-service__content">
-                    <h4 class="item-title">UI/UX Design</h4>
-                    <p>
-                    Sit ut cum molestiae. Dolore ducimus qui quasi. Fugiat consequatur sit vel illum vel et 
-                    a delectus. Vel sequi vitae voluptatem perspiciatis eligendi. Voluptatibus optio natus 
-                    asperiores est commodi amet quia architecto. Dolores necessitatibus et.
-                    </p>
-                </div>
-            </div>
-
-            <div class="column item-service" data-aos="fade-up">
-                <div class="item-service__content">
-                    <h4 class="item-title">Mobile Design</h4>
-                    <p>
-                    Sit ut cum molestiae. Dolore ducimus qui quasi. Fugiat consequatur sit vel illum vel et 
-                    a delectus. Vel sequi vitae voluptatem perspiciatis eligendi. Voluptatibus optio natus 
-                    asperiores est commodi amet quia architecto. Dolores necessitatibus et.
-                    </p>
-                </div>
-            </div>
-
-        </div> <!-- end services-list -->
-
-    </section> <!-- end s-services -->
-
-
-    <!-- CTA
-    ================================================== -->
-    <section class="s-cta ss-dark">
-
-        <div class="row heading-block heading-block--center" data-aos="fade-up">
-            <div class="column large-full">
-                <h2 class="section-desc">
-                    Need a great reliable web hosting?
-                </h2>
-            </div>
-        </div> <!-- end heading-block -->
-
-        <div class="row cta-content" data-aos="fade-up">
-            <div class="column large-full">
-                <p>
-                We highly recommend <a href="https://www.dreamhost.com/r.cgi?287326">DreamHost</a>.
-                Powerful web and Wordpress hosting. Guaranteed.
-                Starting at $2.95 per month.
-                </p>
-
-                <a href="https://www.dreamhost.com/r.cgi?287326" class="btn full-width">Get Started</a>
-            </div>
-        </div> <!-- end ad-content -->
-
-    </section> <!-- end s-cta -->
-
-
-    <!-- works
-    ================================================== -->
-    <section id="works" class="s-works target-section">
-
-        <div class="row heading-block heading-block--center" data-aos="fade-up">
-            <div class="column large-full">
-                <h2 class="section-heading section-heading--centerbottom">Selected Works</h2>
-                <p class="section-desc">
-                    Here are some of my selected works I have done lately. Feel free to 
-                    check them out.
-                </p>
-            </div>
-        </div> <!-- end heading-block -->
-
-        <div class="masonry-wrap">
-
-            <div class="masonry">
-                <div class="grid-sizer"></div>
-    
-                <div class="masonry__brick" data-aos="fade-up">
-                    <div class="item-folio">
-                        <div class="item-folio__thumb">
-                            <a href="images/portfolio/gallery/g-city-building.jpg" class="thumb-link" title="Shutterbug" data-size="1050x700">
-                                <img src="images/portfolio/city-building.jpg" 
-                                     srcset="images/portfolio/city-building.jpg 1x, images/portfolio/city-building@2x.jpg 2x" alt="">
-                            </a>    
-                            <a href="https://www.behance.net/" class="item-folio__project-link" title="Project link" target="_blank"></a>
-                        </div>
-    
-                        <div class="item-folio__text">
-                            <h4 class="item-folio__title">
-                                City Building
-                            </h4>
-                            <p class="item-folio__cat">
-                                Branding
-                            </p>
-                        </div>
-    
-                        <div class="item-folio__caption">
-                            <p>Vero molestiae sed aut natus excepturi. Et tempora numquam. Temporibus iusto quo.Unde dolorem corrupti neque nisi.</p>
-                        </div>
-                    </div>
-                </div> <!-- end masonry__brick -->
-    
-                <div class="masonry__brick" data-aos="fade-up">
-                    <div class="item-folio">
-                        <div class="item-folio__thumb">
-                            <a href="images/portfolio/gallery/g-woodcraft.jpg" class="thumb-link" title="Woodcraft" data-size="1050x700">
-                                <img src="images/portfolio/woodcraft.jpg" 
-                                     srcset="images/portfolio/woodcraft.jpg 1x, images/portfolio/woodcraft@2x.jpg 2x" alt="">
-                            </a>
-                            <a href="https://www.behance.net/" class="item-folio__project-link" title="Project link" target="_blank"></a>
-                        </div>
-                        <div class="item-folio__text">
-                            <h4 class="item-folio__title">
-                                Woodcraft
-                            </h4>
-                            <p class="item-folio__cat">
-                                Web Design
-                            </p>
-                        </div>
-                        <div class="item-folio__caption">
-                            <p>Vero molestiae sed aut natus excepturi. Et tempora numquam. Temporibus iusto quo.Unde dolorem corrupti neque nisi.</p>
-                        </div>
-                    </div>
-                </div> <!-- end masonry__brick -->
-
-                <div class="masonry__brick" data-aos="fade-up">
-                    <div class="item-folio">
-                            
-                        <div class="item-folio__thumb">
-                            <a href="images/portfolio/gallery/g-beetle.jpg" class="thumb-link" title="The Beetle Car" data-size="1050x700">
-                                <img src="images/portfolio/the-beetle.jpg"
-                                     srcset="images/portfolio/the-beetle.jpg 1x, images/portfolio/the-beetle@2x.jpg 2x" alt="">
-                            </a>
-                            <a href="https://www.behance.net/" class="item-folio__project-link" title="Project link" target="_blank"></a>
-                        </div>
-                        <div class="item-folio__text">
-                            <h4 class="item-folio__title">
-                                The Beetle
-                            </h4>
-                            <p class="item-folio__cat">
-                                Web Development
-                            </p>
-                        </div>
-                        <div class="item-folio__caption">
-                            <p>Vero molestiae sed aut natus excepturi. Et tempora numquam. Temporibus iusto quo.Unde dolorem corrupti neque nisi.</p>
-                        </div>
-                    </div>
-                </div> <!-- end masonry__brick -->
-
-                <div class="masonry__brick" data-aos="fade-up">
-                    <div class="item-folio">
-                        <div class="item-folio__thumb">
-                            <a href="images/portfolio/gallery/g-shutterbug.jpg" class="thumb-link" title="Grow Green" data-size="1050x700">
-                                <img src="images/portfolio/shutterbug.jpg" 
-                                     srcset="images/portfolio/shutterbug.jpg 1x, images/portfolio/shutterbug@2x.jpg 2x" alt="">
-                            </a>
-                            <a href="https://www.behance.net/" class="item-folio__project-link" title="Project link" target="_blank"></a>
-                        </div>
-                        <div class="item-folio__text">
-                            <h4 class="item-folio__title">
-                                Shutterbug
-                            </h4>
-                            <p class="item-folio__cat">
-                                Branding
-                            </p>
-                        </div>
-                        <div class="item-folio__caption">
-                            <p>Vero molestiae sed aut natus excepturi. Et tempora numquam. Temporibus iusto quo.Unde dolorem corrupti neque nisi.</p>
-                        </div>
-                    </div>
-                </div> <!-- end masonry__brick -->
-
-                <div class="masonry__brick" data-aos="fade-up">
-                    <div class="item-folio">
-                            
-                        <div class="item-folio__thumb">
-                            <a href="images/portfolio/gallery/g-lamp.jpg" class="thumb-link" title="Guitarist" data-size="1050x700">
-                                <img src="images/portfolio/lamp.jpg" 
-                                     srcset="images/portfolio/lamp.jpg 1x, images/portfolio/lamp@2x.jpg 2x" alt="">
-                            </a>
-                            <a href="https://www.behance.net/" class="item-folio__project-link" title="Project link" target="_blank"></a>
-                        </div>
-                        <div class="item-folio__text">
-                            <h4 class="item-folio__title">
-                                Lamp
-                            </h4>
-                            <p class="item-folio__cat">
-                                Web Design
-                            </p>
-                        </div>
-                        <div class="item-folio__caption">
-                            <p>Vero molestiae sed aut natus excepturi. Et tempora numquam. Temporibus iusto quo.Unde dolorem corrupti neque nisi.</p>
-                        </div>
-                    </div>
-                </div> <!-- end masonry__brick -->
-        
-                <div class="masonry__brick" data-aos="fade-up">
-                    <div class="item-folio">
-                            
-                        <div class="item-folio__thumb">
-                            <a href="images/portfolio/gallery/g-fuji.jpg" class="thumb-link" title="Palmeira" data-size="1050x700">
-                                <img src="images/portfolio/fuji.jpg"
-                                     srcset="images/portfolio/fuji.jpg 1x, images/portfolio/fuji@2x.jpg 2x" alt="">
-                            </a>
-                            <a href="https://www.behance.net/" class="item-folio__project-link" title="Project link" target="_blank"></a>
-                        </div>
-                        <div class="item-folio__text">
-                            <h4 class="item-folio__title">
-                                Fuji
-                            </h4>
-                            <p class="item-folio__cat">
-                                Web Design
-                            </p>
-                        </div>
-                        <div class="item-folio__caption">
-                            <p>Vero molestiae sed aut natus excepturi. Et tempora numquam. Temporibus iusto quo.Unde dolorem corrupti neque nisi.</p>
-                        </div>
-                    </div>
-                </div> <!-- end masonry__brick -->
-
-            </div> <!-- end masonry -->
-
-        </div> <!-- end masonry-wrap -->
-
-    </section> <!-- end s-work -->
-
-
-    <!-- testimonies
-    ================================================== -->
-    <section class="s-testimonials">
-    
-        <div class="row testimonials" data-aos="fade-up">
-
-            <div class="column large-full testimonials__slider">
-
-                <div class="testimonials__slide">
-                    <p>Molestiae incidunt consequatur quis ipsa autem nam sit enim magni. Voluptas tempore rem. 
-                    Explicabo a quaerat sint autem dolore ducimus ut consequatur neque.  Nisi dolores quaerat fuga rem nihil nostrum.
-                    Laudantium quia consequatur molestias delectus culpa.</p>
-                    <div class="testimonials__info">
-                        <img src="images/avatars/user-02.jpg" alt="Author image" class="testimonials__avatar">
-                        <cite class="testimonials__cite">
-                            <strong>Tim Cook</strong>
-                            <span>CEO, Apple</span>
-                        </cite>
-                    </div>
-                </div> <!-- end testimonials__slide -->
-
-                <div class="testimonials__slide">
-                    <p>Excepturi nam cupiditate culpa doloremque deleniti repellat. Veniam quos repellat voluptas animi adipisci.
-                    Nisi eaque consequatur. Voluptatem dignissimos ut ducimus accusantium perspiciatis.
-                        Quasi voluptas eius distinctio. Atque eos maxime.</p>
-                    <div class="testimonials__info">
-                        <img src="images/avatars/user-01.jpg" alt="Author image" class="testimonials__avatar">
-                        <cite class="testimonials__cite">
-                            <strong>Sundar Pichai</strong>
-                            <span>CEO, Google</span>
-                        </cite>
-                    </div>
-                </div> <!-- end testimonials__slide -->
-
-                <div class="testimonials__slide">
-                    <p>Repellat dignissimos libero. Qui sed at corrupti expedita voluptas odit. Nihil ea quia nesciunt. Ducimus aut sed ipsam.  
-                    Autem eaque officia cum exercitationem sunt voluptatum accusamus. Quasi voluptas eius distinctio.
-                    Voluptatem dignissimos ut.</p>
-                    <div class="testimonials__info">
-                        <img src="images/avatars/user-04.jpg" alt="Author image" class="testimonials__avatar">
-                        <cite class="testimonials__cite">
-                            <strong>Satya Nadella</strong>
-                            <span>CEO, Microsoft</span>
-                        </cite>
-                    </div>
-                </div> <!-- end testimonials__slide -->
-                
-            </div> <!-- end testimonials__slider -->
-
-        </div> <!-- end testimonials -->
-
-    </section> <!-- end s-testimonials -->
-
-
-    <!-- contact
-    ================================================== -->
-    <section id="contact" class="s-contact ss-dark target-section">
-
-        <div class="row heading-block" data-aos="fade-up">
-            <div class="column large-full">
-                <h2 class="section-heading">Get In Touch</h2>
-            </div>
-        </div>
-
-        <div class="row contact-main" data-aos="fade-up">
-            <div class="column large-full">
-                <p class="contact-email">
-                    <a href="mailto:#0">hello@epitome.com</a>
-                </p>
-
-                <p class="section-desc">
-                I'm happy to connect, listen and help. Let's work together and build
-                something awesome. Let's turn your idea to an even greater product.
-                <a href="mailto:#0">Email Me</a>.
-                </p>
-            </div>
-        </div>
-
-        <div class="row contact-infos" data-aos="fade-up" data-aos-anchor=".contact-main">
-
-            <div class="column large-5 medium-full contact-phone">
-                <h4>Call Me</h4>
-                <a href="tel:197-543-2345">+197 543 2345</a>
-            </div>
-
-            <div class="column large-7 medium-full contact-social">
-                <h4>Social</h4>
-                <ul>
-                    <li><a href="#0" title="Facebook">Facebook</a></li>
-                    <li><a href="#0" title="Twitter">Twitter</a></li>
-                    <li><a href="#0" title="Instagram">Instagram</a></li>
-                </ul>
-            </div>
-
-        </div> <!-- end contact-infos -->
-
-    </section> <!-- end s-contact -->
-
-
-    <!-- footer
-    ================================================== -->
-    <footer>
-        <div class="row">
-            <div class="column large-full ss-copyright">
-                <span>© Copyright Epitome 2019</span> 
-                <span>Design by <a href="https://www.styleshout.com/">StyleShout</a></span>
-            </div>            
-
-            <div class="ss-go-top">
-                <a class="smoothscroll" title="Back to Top" href="#top"></a>
-            </div>
-        </div>
-    </footer>
-
-
-    <!-- photoswipe background
-    ================================================== -->
-    <div aria-hidden="true" class="pswp" role="dialog" tabindex="-1">
-
-        <div class="pswp__bg"></div>
-        <div class="pswp__scroll-wrap">
-
-            <div class="pswp__container">
-                <div class="pswp__item"></div>
-                <div class="pswp__item"></div>
-                <div class="pswp__item"></div>
-            </div>
-
-            <div class="pswp__ui pswp__ui--hidden">
-                <div class="pswp__top-bar">
-                    <div class="pswp__counter"></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button> <button class="pswp__button pswp__button--share" title=
-                    "Share"></button> <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button> <button class="pswp__button pswp__button--zoom" title=
-                    "Zoom in/out"></button>
-                    <div class="pswp__preloader">
-                        <div class="pswp__preloader__icn">
-                            <div class="pswp__preloader__cut">
-                                <div class="pswp__preloader__donut"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
-                    <div class="pswp__share-tooltip"></div>
-                </div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button> <button class="pswp__button pswp__button--arrow--right" title=
-                "Next (arrow right)"></button>
-                <div class="pswp__caption">
-                    <div class="pswp__caption__center"></div>
-                </div>
-            </div>
-
-        </div>
-
-    </div><!-- end photoSwipe background -->
-
-
-    <!-- Java Script
-    ================================================== -->
-    <script src="js/jquery-3.2.1.min.js"></script>
-    <script src="js/plugins.js"></script>
-    <script src="js/main.js"></script>
-
+    <h2 class="reveal" style="--i:5">Links</h2>
+    <div class="list">
+      <a class="item reveal" style="--i:6" href="https://github.com/Prefect1109" target="_blank" rel="noopener">
+        <span class="ico github"><svg viewBox="0 0 24 24"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.200-1.2 3.200-1.200.6 1.600.2 2.800.1 3.100.8.800 1.200 1.800 1.200 3.100 0 4.400-2.700 5.400-5.300 5.700.4.400.8 1.100.8 2.200v3.200c0 .3.2.7.8.6A11.500 11.500 0 0 0 23.500 12C23.500 5.700 18.300.5 12 .5z"/></svg></span>
+        <span class="txt"><b>GitHub</b><small>@Prefect1109</small></span>
+        <span class="arrow">↗</span>
+      </a>
+      <a class="item reveal" style="--i:7" href="https://www.linkedin.com/in/bogdan-tkachuk/" target="_blank" rel="noopener">
+        <span class="ico linkedin"><svg viewBox="0 0 24 24"><path d="M20.4 20.4h-3.600v-5.600c0-1.300 0-3-1.800-3s-2.100 1.400-2.100 2.900v5.700H9.300V9h3.400v1.600c.5-.9 1.600-1.800 3.400-1.800 3.600 0 4.300 2.400 4.300 5.500v6.100zM5.300 7.400a2.100 2.100 0 1 1 0-4.200 2.100 2.100 0 0 1 0 4.200zM7.100 20.400H3.600V9h3.500v11.400zM22.200 0H1.800C.8 0 0 .8 0 1.700v20.600c0 .9.8 1.700 1.800 1.700h20.400c1 0 1.800-.8 1.800-1.700V1.700C24 .8 23.200 0 22.200 0z"/></svg></span>
+        <span class="txt"><b>LinkedIn</b><small>Bohdan Tkachuk</small></span>
+        <span class="arrow">↗</span>
+      </a>
+      <a class="item reveal" style="--i:8" href="mailto:prefect.t@icloud.com">
+        <span class="ico mail"><svg viewBox="0 0 24 24"><path d="M2 5.500C2 4.700 2.700 4 3.500 4h17c.8 0 1.500.7 1.500 1.500v13c0 .8-.7 1.500-1.500 1.500h-17c-.8 0-1.500-.7-1.500-1.500v-13zm2.200.5L12 11.500 19.800 6H4.200zM20 8l-8 5.600L4 8v10.500h16V8z"/></svg></span>
+        <span class="txt"><b>Email</b><small>prefect.t@icloud.com</small></span>
+        <span class="arrow">↗</span>
+      </a>
+    </div>
+
+    <footer class="reveal" style="--i:9">© Bohdan Tkachuk</footer>
+  </main>
+
+  <script>
+    // typing effect
+    (function () {
+      var words = ["iOS Developer", "App Store publisher", "Building things for iPhone"];
+      var el = document.getElementById("type"), w = 0, c = 0, del = false;
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { el.textContent = words[0]; return; }
+      function tick() {
+        var word = words[w];
+        el.textContent = word.slice(0, c);
+        if (!del && c === word.length) { del = true; return setTimeout(tick, 1600); }
+        if (del && c === 0) { del = false; w = (w + 1) % words.length; return setTimeout(tick, 350); }
+        c += del ? -1 : 1;
+        setTimeout(tick, del ? 30 : 70);
+      }
+      setTimeout(tick, 900);
+    })();
+
+
+    // living background: floating iPhones + app icons
+    (function () {
+      var cv = document.getElementById("fx"), ctx = cv.getContext("2d");
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var W, H, dpr, items = [], mx = 0, my = 0, tx = 0, ty = 0, t = 0;
+      var PAL = [["#7c5cff", "#00d4ff"], ["#ff4fd8", "#7c5cff"], ["#00d4ff", "#3dff9a"], ["#ff7a45", "#ff4fd8"], ["#2f9bff", "#7c5cff"]];
+
+      function rr(x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+      }
+
+      function size() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        W = cv.width = innerWidth * dpr; H = cv.height = innerHeight * dpr;
+        items = [];
+        var phones = innerWidth < 700 ? 4 : 7, icons = innerWidth < 700 ? 10 : 18, i;
+        for (i = 0; i < phones; i++) items.push({
+          k: "phone", x: Math.random() * W, y: Math.random() * H, z: .35 + Math.random() * .65,
+          s: (70 + Math.random() * 60) * dpr, rot: (Math.random() - .5) * .9, vr: (Math.random() - .5) * .0016,
+          vy: -(.12 + Math.random() * .25) * dpr, ph: Math.random() * 6.28, pal: PAL[i % PAL.length]
+        });
+        for (i = 0; i < icons; i++) items.push({
+          k: "icon", x: Math.random() * W, y: Math.random() * H, z: .3 + Math.random() * .7,
+          s: (20 + Math.random() * 20) * dpr, rot: (Math.random() - .5) * .8, vr: (Math.random() - .5) * .003,
+          vy: -(.18 + Math.random() * .35) * dpr, ph: Math.random() * 6.28, pal: PAL[(i + 2) % PAL.length]
+        });
+        items.sort(function (a, b) { return a.z - b.z; });
+      }
+      addEventListener("resize", size); size();
+      addEventListener("pointermove", function (e) { tx = (e.clientX / innerWidth - .5); ty = (e.clientY / innerHeight - .5); });
+
+      function phone(it, x, y) {
+        var w = it.s, h = it.s * 2.05, r = w * .2;
+        ctx.save(); ctx.translate(x, y); ctx.rotate(it.rot + Math.sin(t * .5 + it.ph) * .08);
+        ctx.globalAlpha = .12 + it.z * .38;
+        // body glow
+        ctx.shadowColor = it.pal[0]; ctx.shadowBlur = 28 * dpr * it.z;
+        rr(-w / 2, -h / 2, w, h, r);
+        ctx.fillStyle = "rgba(10,9,20,.75)"; ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.lineWidth = 2 * dpr; var g = ctx.createLinearGradient(-w / 2, -h / 2, w / 2, h / 2);
+        g.addColorStop(0, it.pal[0]); g.addColorStop(1, it.pal[1]); ctx.strokeStyle = g; ctx.stroke();
+        // screen
+        var m = w * .07; rr(-w / 2 + m, -h / 2 + m, w - 2 * m, h - 2 * m, r * .75);
+        var sg = ctx.createLinearGradient(0, -h / 2, 0, h / 2);
+        sg.addColorStop(0, it.pal[0] + "55"); sg.addColorStop(1, it.pal[1] + "22"); ctx.fillStyle = sg; ctx.fill();
+        // dynamic island
+        rr(-w * .17, -h / 2 + m * 1.7, w * .34, w * .1, w * .05); ctx.fillStyle = "#000"; ctx.fill();
+        // mini app grid, pulsing
+        var cols = 3, rows = 4, cell = (w - 2 * m) / (cols + .6), gx = -w / 2 + m + cell * .4, gy = -h / 2 + m * 5;
+        for (var yy = 0; yy < rows; yy++) for (var xx = 0; xx < cols; xx++) {
+          var pu = .5 + .5 * Math.sin(t * 1.6 + it.ph + xx * .9 + yy * .7);
+          rr(gx + xx * cell * 1.05, gy + yy * cell * 1.05, cell * .7, cell * .7, cell * .2);
+          ctx.fillStyle = (xx + yy) % 2 ? it.pal[0] : it.pal[1]; ctx.globalAlpha = (.12 + it.z * .38) * (.35 + pu * .65); ctx.fill();
+        }
+        ctx.globalAlpha = .12 + it.z * .38;
+        // home indicator
+        rr(-w * .18, h / 2 - m * 2.2, w * .36, w * .035, w * .02); ctx.fillStyle = "rgba(255,255,255,.7)"; ctx.fill();
+        ctx.restore();
+      }
+
+      function icon(it, x, y) {
+        var s = it.s;
+        ctx.save(); ctx.translate(x, y); ctx.rotate(it.rot + Math.sin(t * .7 + it.ph) * .12);
+        ctx.globalAlpha = .15 + it.z * .5; ctx.shadowColor = it.pal[0]; ctx.shadowBlur = 18 * dpr * it.z;
+        rr(-s / 2, -s / 2, s, s, s * .225);
+        var g = ctx.createLinearGradient(-s / 2, -s / 2, s / 2, s / 2);
+        g.addColorStop(0, it.pal[0]); g.addColorStop(1, it.pal[1]); ctx.fillStyle = g; ctx.fill();
+        ctx.shadowBlur = 0; ctx.fillStyle = "rgba(255,255,255,.28)";
+        rr(-s / 2, -s / 2, s, s * .5, s * .225); ctx.fill();
+        ctx.restore();
+      }
+
+      function frame() {
+        t += .016; mx += (tx - mx) * .04; my += (ty - my) * .04;
+        ctx.clearRect(0, 0, W, H);
+        for (var i = 0; i < items.length; i++) {
+          var it = items[i];
+          it.y += it.vy * (reduce ? 0 : 1); it.rot += it.vr * (reduce ? 0 : 1);
+          var m = it.s * 2.5;
+          if (it.y < -m) { it.y = H + m; it.x = Math.random() * W; }
+          var x = it.x + Math.sin(t * .6 + it.ph) * 18 * dpr - mx * 90 * it.z * dpr;
+          var y = it.y + Math.cos(t * .5 + it.ph) * 12 * dpr - my * 90 * it.z * dpr;
+          (it.k === "phone" ? phone : icon)(it, x, y);
+        }
+        if (!reduce) requestAnimationFrame(frame);
+      }
+      frame();
+    })();
+
+    // cursor glow
+    var glow = document.getElementById("glow");
+    window.addEventListener("pointermove", function (e) {
+      glow.style.left = e.clientX + "px"; glow.style.top = e.clientY + "px";
+    });
+
+    // 3D tilt + spotlight on cards
+    document.querySelectorAll("a.item").forEach(function (card) {
+      card.addEventListener("pointermove", function (e) {
+        var r = card.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+        card.style.setProperty("--mx", x + "px"); card.style.setProperty("--my", y + "px");
+        var rx = ((y / r.height) - .5) * -8, ry = ((x / r.width) - .5) * 8;
+        card.style.transform = "rotateX(" + rx + "deg) rotateY(" + ry + "deg) translateY(-2px)";
+      });
+      card.addEventListener("pointerleave", function () { card.style.transform = ""; });
+    });
+  </script>
 </body>
+</html>
